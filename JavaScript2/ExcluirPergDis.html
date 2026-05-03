@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Excluir Perguntas Discursivas.</title>
+    <script>
+        let perguntas = [];
+        let indexParaExcluir = -1;
+
+        async function procurar(event) {
+            event.preventDefault();
+            const num = document.getElementById('numBusca').value;
+            
+            const res = await fetch('api.php?arquivo=perguntas.json');
+            perguntas = await res.json();
+            
+            indexParaExcluir = perguntas.findIndex(p => p.numero == num);
+
+            if (indexParaExcluir !== -1) {
+                document.getElementById('areaExclusao').style.display = 'block';
+                document.getElementById('info').innerHTML = `
+                    <tr><td>${perguntas[indexParaExcluir].numero}</td>
+                    <td>${perguntas[indexParaExcluir].pergunta}</td>
+                    <td>${perguntas[indexParaExcluir].resposta}</td></tr>`;
+            } else { alert("Não encontrado."); }
+        }
+
+        async function confirmarExclusao() {
+            perguntas.splice(indexParaExcluir, 1); 
+
+            await fetch('api.php', {
+                method: 'POST',
+                body: JSON.stringify({ arquivo: 'perguntas.json', dados: perguntas })
+            });
+
+            alert("Registro Excluido.");
+            location.reload();
+        }
+    </script>
+</head>
+<body>
+    <button><a href="main.html">Voltar</a></button>
+    <h1>Exclusão de Perguntas discursivas.</h1>
+    <form onsubmit="procurar(event)">
+        <label>Número: </label><input type="text" id="numBusca" required>
+        <input type="submit" value="Procurar">
+    </form>
+    <div id="areaExclusao" style="display:none;">
+        <table border="1">
+            <tr><th>Numero</th><th>Pergunta</th><th>Resposta</th></tr>
+            <tbody id="info"></tbody>
+        </table>
+        <button onclick="confirmarExclusao()">Confirmar Exclusão</button>
+    </div>
+</body>
+</html>

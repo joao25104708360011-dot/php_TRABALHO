@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Excluir Perguntas de Multipla Escolha.</title>
+    <script>
+        let perguntas = [];
+        let indexParaExcluir = -1;
+
+        async function procurar(event) {
+            event.preventDefault();
+            const num = document.getElementById('numBusca').value;
+            
+            const res = await fetch('api.php?arquivo=perguntasMulti.json');
+            perguntas = await res.json();
+            
+            indexParaExcluir = perguntas.findIndex(p => p.numero == num);
+
+            if (indexParaExcluir !== -1) {
+                document.getElementById('areaExclusao').style.display = 'block';
+                document.getElementById('infoPerg').innerHTML = `
+                    <tr>
+                        <td>${perguntas[indexParaExcluir].numero}</td>
+                        <td>${perguntas[indexParaExcluir].pergunta}</td>
+                        <td>${perguntas[indexParaExcluir].op1}</td>
+                        <td>${perguntas[indexParaExcluir].op2}</td>
+                        <td>${perguntas[indexParaExcluir].op3}</td>
+                        <td>${perguntas[indexParaExcluir].optrue}</td>
+                    </tr>`;
+            } else {
+                alert("Pergunta não encontrada.");
+            }
+        }
+
+        async function excluir() {
+            perguntas.splice(indexParaExcluir, 1);
+
+            await fetch('api.php', {
+                method: 'POST',
+                body: JSON.stringify({ arquivo: 'perguntasMulti.json', dados: perguntas })
+            });
+
+            alert("Registro Excluido com sucesso.");
+            location.reload();
+        }
+    </script>
+</head>
+<body>
+    <button><a href="main.html">Voltar</a></button>
+    <h1>Exclusão de Perguntas de Multipla Escolha.</h1>
+    <form onsubmit="procurar(event)">
+        <label>Digite o Numero da Pergunta: </label>
+        <input type="text" id="numBusca" required>
+        <input type="submit" value="Procurar">
+    </form>
+
+    <div id="areaExclusao" style="display:none;">
+        <table border="1">
+            <tr><th>Numero</th><th>Pergunta</th><th>Opção 1</th><th>Opção 2</th><th>Opção 3</th><th>Opção Correta</th></tr>
+            <tbody id="infoPerg"></tbody>
+        </table>
+        <button onclick="excluir()">Confirmar Exclusão</button>
+    </div>
+</body>
+</html>

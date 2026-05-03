@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Listar Pergunta Única</title>
+    <script>
+        async function buscar(event) {
+            event.preventDefault();
+            const tipo = document.getElementById('tipo').value; // 1 ou 2
+            const num = document.getElementById('num').value;
+            const arquivo = tipo === '1' ? 'perguntas.json' : 'perguntasMulti.json';
+
+            const res = await fetch(`api.php?arquivo=${arquivo}`);
+            const dados = await res.json();
+            const perg = dados.find(p => p.numero == num);
+
+            const area = document.getElementById('resultado');
+            if (perg) {
+                let html = `<table border="1"><tr><th>Número</th><th>Pergunta</th>`;
+                if (tipo === '2') {
+                    html += `<th>Op 1</th><th>Op 2</th><th>Op 3</th><th>Correta</th></tr>
+                             <tr><td>${perg.numero}</td><td>${perg.pergunta}</td><td>${perg.op1}</td><td>${perg.op2}</td><td>${perg.op3}</td><td>${perg.optrue}</td></tr>`;
+                } else {
+                    html += `<th>Resposta</th></tr>
+                             <tr><td>${perg.numero}</td><td>${perg.pergunta}</td><td>${perg.resposta}</td></tr>`;
+                }
+                area.innerHTML = html + `</table>`;
+            } else { alert("Não encontrado."); }
+        }
+    </script>
+</head>
+<body>
+    <button><a href="main.html">Voltar</a></button>
+    <h1>Busca de Pergunta Única</h1>
+    <form onsubmit="buscar(event)">
+        <label>Tipo (1-Disc / 2-Multi): </label><input type="text" id="tipo" required>
+        <label>Número: </label><input type="text" id="num" required>
+        <input type="submit" value="Procurar">
+    </form>
+    <div id="resultado" style="margin-top:20px;"></div>
+</body>
+</html>

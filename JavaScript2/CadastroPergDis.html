@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Cadastrar Perguntas Discursivas</title>
+    <script>
+        async function salvar(event) {
+            event.preventDefault();
+            const novaPerg = {
+                numero: document.getElementById('num').value,
+                pergunta: document.getElementById('perg').value,
+                resposta: document.getElementById('resp').value
+            };
+
+            const res = await fetch('api.php?arquivo=perguntas.json');
+            let perguntas = await res.json();
+            perguntas.push(novaPerg);
+
+            await fetch('api.php', {
+                method: 'POST',
+                body: JSON.stringify({ arquivo: 'perguntas.json', dados: perguntas })
+            });
+
+            alert("Pergunta Discursiva Cadastrada!");
+            event.target.reset();
+        }
+    </script>
+</head>
+<body>
+    <button><a href="main.html">Voltar</a></button>
+    <h1>Cadastro de Perguntas Discursivas</h1>
+    <form onsubmit="salvar(event)">
+        <label>Número: </label><input type="text" id="num" required><br>
+        <label>Pergunta: </label><input type="text" id="perg" required><br>
+        <label>Resposta: </label><input type="text" id="resp" required><br>
+        <input type="submit" value="Cadastrar">
+    </form>
+</body>
+</html>

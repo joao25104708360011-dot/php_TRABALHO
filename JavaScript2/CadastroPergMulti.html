@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Cadastrar Perguntas de Multipla Escolha.</title>
+    <script>
+        async function salvar(event) {
+            event.preventDefault();
+            
+            const novaPerg = {
+                numero: document.getElementById('num').value,
+                pergunta: document.getElementById('perg').value,
+                op1: document.getElementById('op1').value,
+                op2: document.getElementById('op2').value,
+                op3: document.getElementById('op3').value,
+                optrue: document.getElementById('optrue').value
+            };
+
+            // 1. Lê o arquivo JSON via PHP
+            const res = await fetch('api.php?arquivo=perguntasMulti.json');
+            let perguntas = await res.json();
+
+            // 2. Adiciona a nova
+            perguntas.push(novaPerg);
+
+            // 3. Salva no arquivo via PHP
+            const salvar = await fetch('api.php', {
+                method: 'POST',
+                body: JSON.stringify({ arquivo: 'perguntasMulti.json', dados: perguntas })
+            });
+
+            if (salvar.ok) {
+                alert("Cadastro de Pergunta Concluido no JSON.");
+                event.target.reset();
+            }
+        }
+    </script>
+</head>
+<body>
+    <button><a href="main.html">Voltar</a></button>
+    <h1>Cadastro de Perguntas de Multipla Escolha.</h1>
+    <form onsubmit="salvar(event)">
+        <label>Numero: </label><input type="text" id="num" required><br>
+        <label>Pergunta: </label><input type="text" id="perg" required><br>
+        <label>Opção 1: </label><input type="text" id="op1" required><br>
+        <label>Opção 2: </label><input type="text" id="op2" required><br>
+        <label>Opção 3: </label><input type="text" id="op3" required><br>
+        <label>Opção Correta: </label><input type="text" id="optrue" required><br>
+        <input type="submit" value="Cadastrar">
+    </form>
+</body>
+</html>

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Alterar Perguntas Discursivas</title>
+    <script>
+        let perguntas = [];
+        let indexAtual = -1;
+
+        async function procurar(event) {
+            event.preventDefault();
+            const num = document.getElementById('numBusca').value;
+            const res = await fetch('api.php?arquivo=perguntas.json');
+            perguntas = await res.json();
+            
+            indexAtual = perguntas.findIndex(p => p.numero == num);
+
+            if (indexAtual !== -1) {
+                document.getElementById('formAlterar').style.display = 'block';
+                document.getElementById('numExibido').innerText = perguntas[indexAtual].numero;
+                document.getElementById('novoPerg').value = perguntas[indexAtual].pergunta;
+                document.getElementById('novoResp').value = perguntas[indexAtual].resposta;
+            } else { alert("Pergunta não encontrada."); }
+        }
+
+        async function confirmarAlteracao(event) {
+            event.preventDefault();
+            perguntas[indexAtual].pergunta = document.getElementById('novoPerg').value;
+            perguntas[indexAtual].resposta = document.getElementById('novoResp').value;
+
+            await fetch('api.php', {
+                method: 'POST',
+                body: JSON.stringify({ arquivo: 'perguntas.json', dados: perguntas })
+            });
+
+            alert("Registro Alterado com sucesso.");
+            location.reload();
+        }
+    </script>
+</head>
+<body>
+    <button><a href="main.html">Voltar</a></button>
+    <h1>Alteração de Perguntas Discursivas</h1>
+    <form onsubmit="procurar(event)">
+        <label>Número da Pergunta: </label><input type="text" id="numBusca" required>
+        <input type="submit" value="Procurar">
+    </form>
+    <div id="formAlterar" style="display:none;">
+        <form onsubmit="confirmarAlteracao(event)">
+            <table border="1">
+                <tr><th>Número</th><th>Pergunta</th><th>Resposta</th></tr>
+                <tr>
+                    <td id="numExibido"></td>
+                    <td><input type="text" id="novoPerg" required></td>
+                    <td><input type="text" id="novoResp" required></td>
+                </tr>
+            </table>
+            <input type="submit" value="Alterar">
+        </form>
+    </div>
+</body>
+</html>
