@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Incluir Aluno</title>
+    <script>
+        function EnviarAluno(){
+            let objForm = document.getElementById("formAluno");
+
+            let mat = document.getElementById("mat");
+            let nome = document.getElementById("nome");
+            let email = document.getElementById("email");
+
+            if (!ValidaForm(mat, nome, email)){
+                return;
+            }
+
+            console.log("Matricula: " +mat+ "/// Nome: " +nome+ "/// Email: " +email);
+
+            let objForm2 = {"matricula":mat, "nome":nome, "email":email};
+            let objJson = JSON.stringify(objForm2);
+
+            console.log("objForm2" + objForm2);
+            console.log("JSON: " +objJson);
+
+            let xmlhttp = new XMLHttpRequest();
+            console.log("1");
+
+            xmlhttp.onreadystatechange = function(){
+                if (this.state == 4 && this.state == 200){
+                    console.log("Chegou a resposta: " + this.responseText);
+                    console.log("2");
+                    document.getElementById("msg").innerHTML = this.responseText;
+                } else 
+                    if (this.readyState < 4) {
+                        console.log("3: "+ this.readyState);
+                    } else
+                        console.log("Requisição falhou: " + this.status);
+                }
+                console.log("4");
+                xmlhttp.open("POST", "http://localhost/3DAW/IncluirAluno.php");
+                xmlhttp.setRequestHeader("Content-Type", "application/json");
+                xmlhttp.send(objJson);
+        }
+        
+
+        function ValidaForm(mat, nome, email){
+            const matRegex = /^([0-9])+$/;
+            const nomeRegex = /^([A-Za-zÀ-ÿ ])+$/;
+            const emailRegex = /^([a-z0-9\.-_]{2,})@([a-z0-9]{2,})(\.[a-z]{2,})(\.[a-z]{2,})?$/i;
+
+            let erros = [];
+
+            if(!matRegex.test(mat)){
+                erros.push("Matrícula inválida (use apenas numeros).");
+            }
+
+            if(!nomeRegex.test(nome) || nome.lengh < 3){
+                erros.push("Nome inválido (minimo 3 letras, sem numeros)");
+            }
+
+
+
+
+
+
+        }
+    </script>
+</head>
+<body>
+    <h1>Incluir Aluno</h1>
+    <hr>
+    <form method="POST" name="formAluno" id="formAluno">
+        <label for="mat">Matrícula: </label>
+        <input type="text" id="mat" name="mat">
+        <label for="nome">Nome: </label>
+        <input type="text" id="nome" name="nome">
+        <label for="email">Email: </label>
+        <input type="text" id="email" itemid="email">
+        <input type="button" value="Enviar" onclick="return EnviarAluno();">
+    </form>
+    <p id="msg"></p>
+    <hr>
+</body>
+</html>
