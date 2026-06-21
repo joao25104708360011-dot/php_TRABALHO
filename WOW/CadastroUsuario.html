@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Usuario</title>
+    <script>
+        function Cadastrar(){
+            let objForm = document.getElementById("formUser");
+            console.log("objForm: " + objForm);
+
+            let id = document.getElementById("id").value;
+            let nome = document.getElementById("nome").value;
+            let phone = document.getElementById("phone").value;
+            let email = document.getElementById("email").value;
+
+            if(!Validar(id, nome, phone, email)){
+               return; 
+            }
+
+            console.log("ID: " + id + "/// nome: " + nome + "/// telefone: " + phone + "/// email: " + email);
+
+            let objForm2 = {"id": id,"nome": nome,"telefone": phone,"email": email};
+            let objJson =  JSON.stringify(objForm2);
+
+            console.log("objForm2: " + objForm2);
+            console.log("JSON: " + objJson);
+
+            let xmlhttp = new XMLHttpRequest();
+            console.log("1");
+
+            xmlhttp.onreadystatechange = function() {
+                if(this.readyState == 4 && this.status == 200){
+                    console.log("Chegou a resposta OK: " + this.responseText);
+                    console.log("2");
+                    document.getElementById("msg").innerHTML = this.responseText;
+                } else
+                    if(this.readyState < 4){
+                        console.log("3:  ", this.readyState);
+                    } else {
+                        console.log("Requisição falhou: " + this.status);
+                    }
+            }
+            console.log("4");
+
+            xmlhttp.open("POST", "CadastroUsuario.php");
+            xmlhttp.setRequestHeader("Content-type", "application/json");
+            xmlhttp.send(objJson);
+        }
+
+        function Validar(id, nome, phone, email){
+            const numRegex = /^([0-9]+$)/;
+            const nomeRegex = /^([A-Za-zÀ-ÿ ])+$/;
+            const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+            let erros = [];
+
+            if(!numRegex.test(id)){
+                erros.push("ID inválido (use apenas números).");
+            }
+
+            if(!nomeRegex.test(nome)){
+                erros.push("Nome inválido");
+            }
+
+            if(!numRegex.test(phone)){
+                erros.push("Telefone Invalido.");
+            }
+
+            if(!emailRegex.test(email)){
+                erros.push("Email Invalido.");
+            }
+
+            if(erros.length > 0){
+                document.getElementById("msg").innerHTML = erros.join("<br>");
+                document.getElementById("msg").style.color = "red";
+                return false;
+            }
+
+            return true;
+        }
+    </script>
+</head>
+<body>
+    <h1>Cadastro de usuario</h1>
+    <form method="POST" id="formUser">
+        <label for="id">ID: </label>
+        <input type="text" name="id" id="id">
+        <label for="nome">Nome: </label>
+        <input type="text" name="nome" id="nome">
+        <label for="phone">Telefone: </label>
+        <input type="text" name="phone" id="phone">
+        <label for="email">Email: </label>
+        <input type="text" name="email" id="email">
+        <input type="button" value="Cadastrar" onclick="return Cadastrar();">
+    </form>
+    <hr>
+    <p id="msg"></p>
+</body>
+</html>

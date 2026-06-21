@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Listar usuarios</title>
+    <script>
+        function Listar(){
+            let xmlhttp = new XMLHttpRequest();
+            console.log("1");
+            xmlhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    console.log("Chegou a resposta OK: " + this.responseText);
+                    console.log("2");
+                    document.getElementById("msg").innerHTML = this.responseText;
+
+                    let objReturnJSON = JSON.parse(this.responseText);
+                    console.log("Resposta: " + this.responseText);
+
+                    document.getElementById("lista").innerHTML = '<tr id="ultimaLinha"><td colspan="4"></td></tr>';
+                    
+                    for (let i=0; i<objReturnJSON.length; i++) {
+                        let linha = objReturnJSON[i];
+
+                        CriarLinhaTabela(linha, "ultimaLinha");
+                    }
+                } else
+                    if (this.readyState < 4) {
+                        console.log("3: " + this.readyState);
+                    } else
+                        console.log("Requisicao falhou: " + this.status);
+            }
+            console.log("4");
+
+            xmlhttp.open("GET", "ListarUsuarios.php");
+            xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+            xmlhttp.send();
+            console.log("enviei request get");
+            console.log("5");
+        }
+
+        function CriarLinhaTabela(obj, alvo){
+            let tr = document.createElement("tr");
+
+        let tdId = document.createElement("td");
+        tdId.textContent = obj.id;
+        tr.appendChild(tdId);
+
+        let tdNome = document.createElement("td");
+        tdNome.textContent = obj.nome;
+        tr.appendChild(tdNome);
+
+        let tdPhone = document.createElement("td");
+        tdPhone.textContent = obj.telefone;
+        tr.appendChild(tdPhone);
+
+        let tdEmail = document.createElement("td");
+        tdEmail.textContent = obj.email;
+        tr.appendChild(tdEmail);
+
+        let tr_fim = document.getElementById(alvo);
+        if (tr_fim) {
+            tr_fim.parentNode.insertBefore(tr, tr_fim);
+        }
+    }
+    </script>
+</head>
+<body onload="Listar()">
+    <h1>Usuarios</h1>
+
+    <table id="lista">
+        <tr id="ultimaLinha">
+            <td colspan="4"></td>
+        </tr>
+    </table>
+
+    <p id="msg"></p>
+</body>
+</html>

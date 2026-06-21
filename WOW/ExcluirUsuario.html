@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Excluir Usuarios</title>
+    <script>
+        function Buscar(){
+            let id = document.getElementById("id").value;
+
+            if(!Validar(id)){
+                return;
+            }
+
+            let xmlhttp = new XMLHttpRequest();
+            xmlhttp.onreadystatechange = function(){
+                if(this.readyState == 4 && this.status == 200){
+
+                    let aux = JSON.parse(this.responseText);
+
+                    if(aux && !aux.erro){
+                        CriarForm(aux);
+
+                        document.getElementById("msg").innerHTML = "Registro encontrado.";
+                        document.getElementById("msg").style.color = "green";
+                    } else {
+                        document.getElementById("minhaTabela").innerHTML = "";
+                        document.getElementById("msg").innerHTML = "Registro não encontrado.";
+                    }
+                }
+            };
+
+            xmlhttp.open("GET", "Buscar.php?id=" + id + "&tabela=" + 1);
+            xmlhttp.send();
+        }
+
+        function CriarForm(aux){
+
+            let tabela = document.getElementById("minhaTabela");
+            tabela.innerHTML = "";
+
+            let trCabeca = document.createElement("tr");
+
+            let cabecalhos = ["ID", "Nome", "Telefone", "Email", "Ação"];
+            cabecalhos.forEach(texto => {
+                let th = document.createElement("th");
+                th.appendChild(document.createTextNode(texto));
+                trCabeca.appendChild(th);
+            });
+
+            tabela.appendChild(trCabeca);
+
+            let trCorpo = document.createElement("tr");
+
+            let tdId = document.createElement("td");
+            let inputId = document.createElement("input");
+            inputId.type = "text";
+            inputId.id = "idExc";
+            inputId.value = aux.id;
+            inputId.readOnly = true;
+            tdId.appendChild(inputId);
+
+            let tdNome = document.createElement("td");
+            let inputNome = document.createElement("input");
+            inputNome.type = "text";
+            inputNome.id = "nomeExc";
+            inputNome.value = aux.nome;
+            inputNome.readOnly = true;
+            tdNome.appendChild(inputNome);
+
+            let tdTele = document.createElement("td");
+            let inputTele = document.createElement("input");
+            inputTele.type = "text";
+            inputTele.id = "phoneExc";
+            inputTele.value = aux.telefone;
+            inputTele.readOnly = true;
+            tdTele.appendChild(inputTele);
+
+            let tdEmail = document.createElement("td");
+            let inputEmail = document.createElement("input");
+            inputEmail.type = "text";
+            inputEmail.id = "emailExc";
+            inputEmail.value = aux.email;
+            inputEmail.readOnly = true;
+            tdEmail.appendChild(inputEmail);
+
+            let tdAcao = document.createElement("td");
+            let btn = document.createElement("button");
+            btn.innerHTML = "Excluir Registro";
+            btn.onclick = function() {Excluir(aux.id);}
+            tdAcao.appendChild(btn);
+
+            trCorpo.appendChild(tdId);
+            trCorpo.appendChild(tdNome);
+            trCorpo.appendChild(tdTele);
+            trCorpo.appendChild(tdEmail);
+            trCorpo.appendChild(tdAcao);
+
+            tabela.appendChild(trCorpo);
+        }
+
+        function Excluir(id){
+            
+            if(!Validar(id)){
+                return;
+            }
+
+            console.log("id: ",id);
+
+            let objForm = {"id": id}
+            let objJson = JSON.stringify(objForm);
+
+            console.log("objForm2: " + objForm);
+            console.log("JSON: " + objJson);
+
+            let xmlhttp = new XMLHttpRequest();
+            console.log("1");
+            xmlhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    console.log("2");
+                    let res = JSON.parse(this.responseText);
+                    document.getElementById("msg").innerHTML = res.mensagem;
+                    
+                } else
+                    if (this.readyState < 4) {
+                        console.log("3: " + this.readyState);
+                    } else
+                        console.log("Requisicao falhou: " + this.status);
+            };
+            console.log("4");
+
+            xmlhttp.open("POST", "ExcluirUsuario.php");
+            xmlhttp.setRequestHeader("Content-Type", "application/json");
+            xmlhttp.send(objJson);
+        }
+
+        function Validar(id){
+            const numRegex = /^([0-9]+$)/;
+        
+            let erros = [];
+
+            if (!numRegex.test(id)) {
+                erros.push("Número inválido.");
+            }
+
+            if (erros.length > 0) {
+                document.getElementById("msg").innerHTML = erros.join("<br>");
+                document.getElementById("msg").style.color = "red";
+                return false;
+            }
+
+            return true;
+        }
+    </script>
+</head>
+<body>
+    <h1>Excluir Usuario</h1>
+    <form method="POST" id="formAlt">
+        <label for="id">Digite o id do usuario: </label>
+        <input type="text" id="id">
+        <input type="button" value="Buscar" onclick="Buscar();">
+    </form>
+
+    <p id="msg"></p>
+
+    <table id="minhaTabela"></table>
+</body>
+</html>
